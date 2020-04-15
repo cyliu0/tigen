@@ -33,7 +33,7 @@ var columnCount, rowCount, threadCount int
 
 func init() {
 	rootCmd.PersistentFlags().StringVar(&host, "host", "127.0.0.1", "DB host")
-	rootCmd.PersistentFlags().IntVar(&port, "host", 4000, "DB port")
+	rootCmd.PersistentFlags().IntVar(&port, "port", 4000, "DB port")
 	rootCmd.PersistentFlags().StringVar(&user, "user", "root", "DB username")
 	rootCmd.PersistentFlags().StringVar(&pass, "pass", "", "DB password")
 	rootCmd.PersistentFlags().StringVar(&table, "table", "t", "Table name")
