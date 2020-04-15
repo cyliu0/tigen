@@ -13,6 +13,8 @@ var rootCmd = &cobra.Command{
 	Use:   "tigen",
 	Short: "A toolkit to generate test data for TiDB/MySQL",
 	Run: func(cmd *cobra.Command, args []string) {
+		logger, _ = zap.NewProduction()
+		defer logger.Sync()
 		c := db.MysqlClient{
 			Addr: db.Addr{
 				Host: host,
@@ -20,15 +22,17 @@ var rootCmd = &cobra.Command{
 				User: user,
 				Pass: pass,
 			},
-			Schema: "test",
+			Schema: database,
+			Logger: logger,
 		}
 		c.GenTableWithData(table, columnCount, rowCount, threadCount)
+		logger.Info("Data generating finished...")
 	},
 }
 
 var host, user, pass string
 var port int
-var table string
+var database, table string
 var columnCount, rowCount, threadCount int
 
 func init() {
@@ -36,6 +40,7 @@ func init() {
 	rootCmd.PersistentFlags().IntVar(&port, "port", 4000, "DB port")
 	rootCmd.PersistentFlags().StringVar(&user, "user", "root", "DB username")
 	rootCmd.PersistentFlags().StringVar(&pass, "pass", "", "DB password")
+	rootCmd.PersistentFlags().StringVar(&database, "database", "test", "Database name")
 	rootCmd.PersistentFlags().StringVar(&table, "table", "t", "Table name")
 	rootCmd.PersistentFlags().IntVar(&columnCount, "columns", 10, "Column count")
 	rootCmd.PersistentFlags().IntVar(&rowCount, "rows", 20000, "Row count")
