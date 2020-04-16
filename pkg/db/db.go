@@ -51,7 +51,7 @@ func (m MysqlClient) Open() (*sql.DB, error) {
 	return sql.Open("mysql", m.Addr.Dsn(m.Schema))
 }
 
-func (m MysqlClient) GenTableWithData(name string, columnCount int, rowCount int, threadCount int) {
+func (m MysqlClient) GenTableWithData(name string, columnCount, rowCount, threadCount, batch int,) {
 	createStmt, types := genCreateStmt(name, columnCount, true)
 	db, err := m.Open()
 	if err != nil {
@@ -66,7 +66,6 @@ func (m MysqlClient) GenTableWithData(name string, columnCount int, rowCount int
 	}
 	insertCount := rowCount / threadCount
 	leftCount := rowCount % threadCount
-	batch := 1000
 	wg := sync.WaitGroup{}
 	wg.Add(threadCount)
 	for i:=0; i < threadCount; i++ {

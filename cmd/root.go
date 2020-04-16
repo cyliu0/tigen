@@ -25,7 +25,7 @@ var rootCmd = &cobra.Command{
 			Schema: database,
 			Logger: logger,
 		}
-		c.GenTableWithData(table, columnCount, rowCount, threadCount)
+		c.GenTableWithData(table, columnCount, rowCount, threadCount, batch)
 		logger.Info("Data generating finished...")
 	},
 }
@@ -33,7 +33,7 @@ var rootCmd = &cobra.Command{
 var host, user, pass string
 var port int
 var database, table string
-var columnCount, rowCount, threadCount int
+var columnCount, rowCount, threadCount, batch int
 
 func init() {
 	rootCmd.PersistentFlags().StringVar(&host, "host", "127.0.0.1", "DB host")
@@ -45,6 +45,7 @@ func init() {
 	rootCmd.PersistentFlags().IntVar(&columnCount, "columns", 10, "Column count")
 	rootCmd.PersistentFlags().IntVar(&rowCount, "rows", 20000, "Row count")
 	rootCmd.PersistentFlags().IntVar(&threadCount, "threads", 10, "Thread count")
+	rootCmd.PersistentFlags().IntVar(&batch, "batch", 1000, "Batch number")
 }
 
 func Execute() {
