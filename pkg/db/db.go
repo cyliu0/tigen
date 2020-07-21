@@ -51,7 +51,7 @@ func (m MysqlClient) Open() (*sql.DB, error) {
 	return sql.Open("mysql", m.Addr.Dsn(m.Schema))
 }
 
-func (m MysqlClient) GenTableWithData(name string, columnCount, rowCount, threadCount, batch int,) {
+func (m MysqlClient) GenTableWithData(name string, columnCount, rowCount, threadCount, batch int) {
 	createStmt, types := genCreateStmt(name, columnCount, true)
 	db, err := m.Open()
 	if err != nil {
@@ -68,7 +68,7 @@ func (m MysqlClient) GenTableWithData(name string, columnCount, rowCount, thread
 	leftCount := rowCount % threadCount
 	wg := sync.WaitGroup{}
 	wg.Add(threadCount)
-	for i:=0; i < threadCount; i++ {
+	for i := 0; i < threadCount; i++ {
 		go func(i int) {
 			db, err := m.Open()
 			if err != nil {
@@ -87,12 +87,12 @@ func (m MysqlClient) GenTableWithData(name string, columnCount, rowCount, thread
 
 func (m MysqlClient) batchInsert(insertCount, batch int, db *sql.DB, name string, types map[string]string) {
 	insertTimes := insertCount / batch
-	if insertCount % batch != 0 {
+	if insertCount%batch != 0 {
 		insertTimes += 1
 	}
 	for i := 0; i < insertTimes; i++ {
 		insertRowCount := batch
-		if i+1 == insertTimes && insertCount % batch != 0 {
+		if i+1 == insertTimes && insertCount%batch != 0 {
 			insertRowCount = insertCount % batch
 		}
 		insertStmt := genInsertStmt(name, insertRowCount, types)
@@ -107,7 +107,7 @@ func (m MysqlClient) batchInsert(insertCount, batch int, db *sql.DB, name string
 func genInsertStmt(name string, insertRowCount int, types map[string]string) string {
 	cols := make([]string, 0)
 	colsStmt := "("
-	for i :=2; i < len(types) + 2; i++ {
+	for i := 2; i < len(types)+2; i++ {
 		col := fmt.Sprintf("col_%d", i)
 		cols = append(cols, col)
 		if colsStmt != "(" {
@@ -117,7 +117,7 @@ func genInsertStmt(name string, insertRowCount int, types map[string]string) str
 	}
 	colsStmt += ")"
 	rowStmts := make([]string, 0)
-	for i:=0; i < insertRowCount; i++ {
+	for i := 0; i < insertRowCount; i++ {
 		rowStmt := ""
 		for _, col := range cols {
 			t := types[col]
@@ -166,13 +166,13 @@ func randStringBytesMaskImprSrcSB(n int) string {
 	return sb.String()
 }
 
-func genCreateStmt(name string, columnCount int, primaryKey bool) (string, map[string]string){
+func genCreateStmt(name string, columnCount int, primaryKey bool) (string, map[string]string) {
 	columnStmts := make([]string, 0)
 	types := make(map[string]string, 0)
 	if primaryKey {
-		columnStmts = append(columnStmts, "pk int auto_increment primary key")
+		columnStmts = append(columnStmts, "pk bigint auto_random primary key")
 	}
-	for i:=len(columnStmts); i < columnCount; i++ {
+	for i := len(columnStmts); i < columnCount; i++ {
 		colType := randType()
 		colId := fmt.Sprintf("col_%d", i+1)
 		types[colId] = colType
